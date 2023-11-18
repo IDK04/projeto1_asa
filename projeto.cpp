@@ -10,43 +10,84 @@
 
 using namespace std;
 
-/* estrutura que define a peça (matriz é a representação )*/
-/* pode ser alterada se acharmos que nao se adequa */
-typedef struct{
-    int X;
-    int Y;
-    vector<vector<int>> matriz;
-} peça;
+#define HORIZONTAL 0
+#define VERTICAL 1
 
-/* corte */
 typedef struct {
-    int x;
-    int y;
-    int preco;
-} corte;
+    int line;
+    int col;
+} part;
 
-/* para definir o tipo do vetor (ponteiros para structs corte)*/
-typedef corte* Corte;
+/* cut */
+typedef struct {
+    part p;
+    int price;
+} cut;
 
-vector<Corte> leInput(){
+/* to define the vector type */
+
+vector<cut> readInput(){
     int n;
     cin >> n;
-    vector<Corte> cortes ;
+    vector<cut> cuts ;
 
     for (int i=0;i<n;i++){
-        corte *c = new corte;
-        cin >> c->x >> c->y >> c->preco;
-        cortes.push_back(c);
+        cut c;
+        cin >> c.p.line >> c.p.col >> c.price;
+        cuts.push_back(c);
     }
-    return  cortes;
+    return  cuts;
 }
+
+/* force p1 to fits in p2 (if is possible) */
+int fitsInPart(part *p1, part p2){
+    /* rotation 1 - default */
+    if (p1->line <=  p2.line && p1->col <= p2.col){
+        return 1;
+    }
+    /* rotaion 2 - inverse */
+    if (p1->col <= p2.line && p1->line <= p2.col){
+        int temp = p1->line;
+        p1->line = p1->col;
+        p1->col = temp;
+        return 1;
+    }
+    return 0;
+}
+
+/* cut in vertical or horizontal */
+part cutPart(part partToCut,part cutReference,int orientation){
+    if (orientation == HORIZONTAL){
+        partToCut.line -= cutReference.line;
+    }
+    if (orientation == VERTICAL){
+        partToCut.col -= cutReference.col;
+    }
+    return partToCut;
+}
+
+int knapsack(vector<cut> cuts, part currentpart) {
+    if (currentpart.line == 0 || currentpart.col == 0) return 0;
+
+    int maxValue = 0;
+    int numObjects = cuts.size();
+    for (int i = 0; i < numObjects; i++) {
+        if (fitsInPart(&cuts[i].p,currentpart)) {
+            maxValue = max(maxValue,max (knapsack(cuts,cutPart(currentpart,cuts[i].p,HORIZONTAL)) + cuts[i].price, 
+                                        knapsack(cuts,cutPart(currentpart,cuts[i].p,VERTICAL)) + cuts[i].price));
+        }
+    }
+    return maxValue;
+} 
+
 
 int main(){
     /* variveis responsaveis por guardar o tamanho da peça*/
     int x,y;
     cin >> x;
     cin >> y;
-    vector<Corte> cortes = leInput();
-
+    vector<cut> cuts = readInput();
+    int result = knapsack(cuts,{x,y});
+    cout << result;
     return 0;
 }
