@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -90,7 +91,7 @@ int knapsack(vector<cut> cuts, part currentPart, cut lastCutReference, part last
             if(isEqualPart(p1,lastPartToCut) || isEqualPart(p2,lastPartToCut)) return 0;
             int h1 = knapsack(cuts, p1, cuts[i],currentPart);
             int h2 = knapsack(cuts, p2, cuts[i],currentPart);
-
+            
             cutPart(currentPart, cuts[i].p, VERTICAL, &p1, &p2);
             if(isEqualPart(p1,lastPartToCut) || isEqualPart(p2,lastPartToCut)) return 0;
             int v1 = knapsack(cuts, p1, cuts[i],currentPart);
@@ -105,11 +106,19 @@ int knapsack(vector<cut> cuts, part currentPart, cut lastCutReference, part last
 
 int main(){
     /* variveis responsaveis por guardar o tamanho da peça*/
+    auto start = std::chrono::high_resolution_clock::now();
     int x,y;
     cin >> x;
     cin >> y;
     vector<cut> cuts = readInput();
     int result = knapsack(cuts,{x,y},{0,0},{0,0});
     cout << result << "\n";
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    // Print the duration in milliseconds
+    std::cout << "Runtime: " << duration.count() << " milliseconds" << std::endl;
     return 0;
 }
