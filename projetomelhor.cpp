@@ -54,6 +54,7 @@ int knapsackv2(vector<cut> cuts,part maxSize) {
     int numCuts = cuts.size();
     for (int i = 1; i <= maxSize.line; i++) {
         for(int j = 1; j <= maxSize.col; j++) {
+            values[i][j] = max(values[i-1][j-1],max(values[i][j-1],values[i-1][j]));
             for (int w = 0; w < numCuts; w++) {
                 part p1=cuts[w].p;
                 if (p1.line <=  i && p1.col <= j){
@@ -65,7 +66,9 @@ int knapsackv2(vector<cut> cuts,part maxSize) {
                 }
             }
         }
-    } return values[maxSize.line][maxSize.col];
+    }
+    
+    return values[maxSize.line][maxSize.col];
 }
 
 int main(){
