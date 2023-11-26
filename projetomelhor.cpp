@@ -7,13 +7,9 @@
 
 #include <iostream>
 #include <vector>
-#include <chrono>
 #include <stdio.h>
 
 using namespace std;
-
-#define HORIZONTAL 0
-#define VERTICAL 1
 
 typedef struct {
     int line;
@@ -36,20 +32,25 @@ part transpose(part p){
 vector<cut> readInput(){
     int n;
     cin >> n;
-    vector<cut> cuts ;
+    vector<cut> cuts;
 
     for (int i=0;i<n;i++){
         cut c,cT;
         cin >> c.p.line >> c.p.col >> c.price;
-        cT.p = transpose(c.p);
-        cT.price = c.price;
+        if (c.p.line <= 0 || c.p.col <= 0 || c.price <= 0){
+            continue;
+        }
+        if ((cT.p.line != c.p.line) || (cT.p.col != c.p.col)){
+            cT.p = transpose(c.p);
+            cT.price = c.price;
+            cuts.push_back(cT);
+        }
         cuts.push_back(c);
-        cuts.push_back(cT);
     }
     return cuts;
 }
 
-int knapsackv2(vector<cut> cuts,part maxSize) {
+int knapsackv2(vector<cut> &cuts,part maxSize) {
     vector<vector<int>> values(maxSize.line+1, vector<int>(maxSize.col+1, 0));
     int numCuts = cuts.size();
     for (int i = 1; i <= maxSize.line; i++) {
@@ -72,19 +73,12 @@ int knapsackv2(vector<cut> cuts,part maxSize) {
 }
 
 int main(){
-    /* variveis responsaveis por guardar o tamanho da peça*/
-    auto start = std::chrono::high_resolution_clock::now();
     int x,y;
-    cin >> x >> y;
+    cin >> x;
+    cin >> y;
+    part smallestPart;
     vector<cut> cuts = readInput();
     int result = knapsackv2(cuts,{x,y});
     cout << result << "\n";
-    auto end = std::chrono::high_resolution_clock::now();
-
-    // Calculate the duration
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-    // Print the duration in milliseconds
-    std::cout << "Runtime: " << duration.count() << " milliseconds" << std::endl;
     return 0;
 }
