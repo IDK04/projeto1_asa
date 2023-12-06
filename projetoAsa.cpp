@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <stdio.h>
+#include <chrono>
 
 using namespace std;
 
@@ -48,11 +49,17 @@ int bestCut(vector<vector<int>> &values) {
 }
 
 int main(){
+    auto start = std::chrono::high_resolution_clock::now();
     int x,y;
     scanf("%d%d", &x, &y);
     vector<vector<int>> values(x+1, vector<int>(y+1, 0));
     readInput(values);
     int result = bestCut(values);
     printf("%d\n", result);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
+    cout << duration.count() << "\n"; 
+
     return 0;
 }
